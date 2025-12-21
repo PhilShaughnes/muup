@@ -1,0 +1,40 @@
+:root {
+/* Green */
+  /* --bg:#282c34;--fg:#7db16f;--border:#333;--success:#00ff00;--error:#ff3333;--muted:#009900; */
+/* Yellow */
+  --bg: #f6d307; --fg: #1f1f1f; --border: #8a7a00; --success: #006600; --error: #990000; --muted: #555;
+/* Amber */
+  /* --bg:#1a0800;--fg:#ffb000;--border:#663300;--success:#00ff00;--error:#ff3333;--muted:#996600; */
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background: var(--bg); color: var(--fg); font-family: 'SF Mono', Monaco, 'Courier New', monospace; font-size: 14px; line-height: 1.6; padding: 1rem; max-width: 900px; margin: 0 auto; }
+header { margin-bottom: 2rem; padding-bottom: 1rem; border-bottom: 2px solid var(--border); }
+header h1 { font-size: 1.5rem; font-weight: normal; }
+header p { color: var(--muted); }
+.monitor-row { padding: 0.75rem 0; border-bottom: 1px solid var(--border); cursor: pointer; display: flex; justify-content: space-between; align-items: center; }
+.monitor-row:hover { background: rgba(0,0,0,0.05); }
+.monitor-info { display: flex; align-items: center; gap: 0.75rem; }
+.status-dot { font-size: 0.8rem; }
+.status-dot.up { color: var(--success); }
+.status-dot.down { color: var(--error); }
+.monitor-name { font-weight: bold; }
+.monitor-stats { display: flex; gap: 2rem; color: var(--muted); }
+.details-toggle { display: none; }
+.details { display: none; padding: 1rem; margin: 0.5rem 0 1rem 0; border: 1px solid var(--border); background: rgba(0,0,0,0.03); }
+.details-toggle:checked + .monitor-row + .details { display: block; }
+.details h3 { margin-bottom: 0.5rem; font-weight: normal; }
+.details-url { color: var(--muted); font-size: 0.9em; margin-bottom: 1rem; }
+.details section { margin: 1rem 0; }
+.details section h4 { font-weight: normal; border-bottom: 1px solid var(--border); margin-bottom: 0.5rem; }
+.stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+.stat-item label { display: block; color: var(--muted); font-size: 0.85em; }
+.sparkline { letter-spacing: 0.05em; }
+.sparkline-stats { color: var(--muted); font-size: 0.85em; }
+table { width: 100%; border-collapse: collapse; }
+table td { padding: 0.25rem 0.5rem; border-bottom: 1px solid var(--border); }
+table td:first-child { color: var(--muted); }
+.check-up { color: var(--success); }
+.check-down { color: var(--error); }
+button { background: var(--fg); color: var(--bg); border: none; padding: 0.5rem 1rem; font-family: inherit; font-size: inherit; cursor: pointer; margin-top: 1rem; }
+button:hover { opacity: 0.8; }
+.htmx-request { opacity: 0.5; }

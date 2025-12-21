@@ -1,0 +1,12 @@
+[Unit]
+Description=muup - micro uptime monitor
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=%h/.local/bin/muup --config %h/.config/muup/config.toml --db %h/.local/share/muup/muup.db --port 8080
+Restart=on-failure
+RestartSec=10
+
+[Install]
+WantedBy=default.target

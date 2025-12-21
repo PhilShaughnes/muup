@@ -1,0 +1,16 @@
+{{range .}}
+<input type="checkbox" id="toggle-{{.Monitor.ID}}" class="details-toggle" hidden>
+<label for="toggle-{{.Monitor.ID}}" class="monitor-row" hx-get="/monitors/{{.Monitor.ID}}" hx-target="#details-{{.Monitor.ID}}" hx-trigger="click once">
+  <div class="monitor-info">
+    <span class="status-dot {{if .CurrentUp}}up{{else}}down{{end}}">●</span>
+    <span class="monitor-name">{{.Monitor.Name}}</span>
+  </div>
+  <div class="monitor-stats">
+    <span>{{formatStreak .StreakDuration .CurrentUp}}</span>
+    <span>{{formatLatency .AvgLatency24h}} avg</span>
+  </div>
+</label>
+<div id="details-{{.Monitor.ID}}" class="details"></div>
+{{else}}
+<p>No monitors configured.</p>
+{{end}}
