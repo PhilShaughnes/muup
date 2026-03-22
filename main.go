@@ -15,9 +15,6 @@ func main() {
 	if err != nil {
 		log.Fatalf("config: %v", err)
 	}
-	if *port == 8080 && cfg.Server.Port != 0 {
-		*port = cfg.Server.Port
-	}
 
 	db, err := OpenDB(*dbPath)
 	if err != nil {
@@ -37,8 +34,6 @@ func main() {
 	checker := NewChecker(db)
 	checker.Start(monitors)
 	defer checker.Stop()
-
-	StartRollup(db)
 
 	server, err := NewServer(db, checker)
 	if err != nil {

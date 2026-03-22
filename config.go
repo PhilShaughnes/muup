@@ -8,13 +8,7 @@ import (
 
 // Config represents the application configuration
 type Config struct {
-	Server   ServerConfig    `toml:"server"`
 	Monitors []MonitorConfig `toml:"monitor"`
-}
-
-// ServerConfig holds server settings
-type ServerConfig struct {
-	Port int `toml:"port"`
 }
 
 // MonitorConfig represents a monitor from config file
@@ -40,9 +34,6 @@ func LoadConfig(path string) (*Config, error) {
 	}
 
 	// Set defaults
-	if cfg.Server.Port == 0 {
-		cfg.Server.Port = 8080
-	}
 	for i := range cfg.Monitors {
 		if cfg.Monitors[i].Interval == 0 {
 			cfg.Monitors[i].Interval = 30

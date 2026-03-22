@@ -2,63 +2,53 @@
 <p class="details-url">{{.Monitor.URL}}</p>
 
 <div class="status-line">
-  Status: <span class="status-dot {{if .CurrentUp}}up{{else}}down{{end}}">●</span>
+  <span class="status-dot {{if .CurrentUp}}up{{else}}down{{end}}">●</span>
   <strong>{{if .CurrentUp}}UP{{else}}DOWN{{end}}</strong>
-  &mdash; {{formatStreak .StreakDuration .CurrentUp}} (since {{.StreakStart.Format "2006-01-02 15:04"}})
+  since {{formatTime .StreakStart}} ({{formatStreak .StreakDuration .CurrentUp}})
 </div>
 
 <section>
-  <h4>Uptime</h4>
-  <div class="stats-grid">
-    <div class="stat-item">
-      <label>24 hours</label>
-      <span>{{formatUptime .Uptime24h}}</span>
-    </div>
-    <div class="stat-item">
-      <label>7 days</label>
-      <span>{{formatUptime .Uptime7d}}</span>
-    </div>
-    <div class="stat-item">
-      <label>30 days</label>
-      <span>{{formatUptime .Uptime30d}}</span>
-    </div>
-  </div>
+  <h4>
+    STATUS ({{.SelectedRange}})
+    <span style="float: right; font-weight: normal;">
+      <a hx-get="/monitors/{{.Monitor.ID}}?range=24h" hx-target="#details-{{.Monitor.ID}}" hx-swap="innerHTML" class="time-range-tab {{if eq .SelectedRange "24h"}}active{{end}}">[24h]</a>
+      <a hx-get="/monitors/{{.Monitor.ID}}?range=7d" hx-target="#details-{{.Monitor.ID}}" hx-swap="innerHTML" class="time-range-tab {{if eq .SelectedRange "7d"}}active{{end}}">[7d]</a>
+      <a hx-get="/monitors/{{.Monitor.ID}}?range=30d" hx-target="#details-{{.Monitor.ID}}" hx-swap="innerHTML" class="time-range-tab {{if eq .SelectedRange "30d"}}active{{end}}">[30d]</a>
+      <a hx-get="/monitors/{{.Monitor.ID}}?range=6mo" hx-target="#details-{{.Monitor.ID}}" hx-swap="innerHTML" class="time-range-tab {{if eq .SelectedRange "6mo"}}active{{end}}">[6mo]</a>
+      <a hx-get="/monitors/{{.Monitor.ID}}?range=1y" hx-target="#details-{{.Monitor.ID}}" hx-swap="innerHTML" class="time-range-tab {{if eq .SelectedRange "1y"}}active{{end}}">[1y]</a>
+    </span>
+  </h4>
+  <p class="status-graph">{{.StatusGraph}}</p>
+  <p style="margin-top: 0.5rem;">Latency (when up): median {{formatLatency .MedianLatency}} | max {{formatLatency .MaxLatency}}</p>
 </section>
 
 <section>
-  <h4>Response Time</h4>
-  <div class="stats-grid">
-    <div class="stat-item">
-      <label>24h avg</label>
-      <span>{{formatLatency .AvgLatency24h}}</span>
-    </div>
-    <div class="stat-item">
-      <label>7d avg</label>
-      <span>{{formatLatency .AvgLatency7d}}</span>
-    </div>
-  </div>
-  {{if .LatencyHistory}}
-  <div style="margin-top: 0.5rem;">
-    <span class="sparkline">{{sparkline .LatencyHistory 24}}</span>
-    {{$mm := minMax .LatencyHistory}}
-    <span class="sparkline-stats">min: {{$mm.Min}}ms / max: {{$mm.Max}}ms</span>
-  </div>
+  <h4>State Change Log</h4>
+  {{if .StateChanges}}
+  <ul style="list-style: none; padding: 0;">
+    {{range $i, $change := .StateChanges}}
+    {{if $i}}
+      {{$prev := index $.StateChanges (sub $i 1)}}
+      {{$duration := timeBetween $change.Timestamp $prev.Timestamp}}
+    <li style="margin: 0.25rem 0;">
+      <span class="{{if .NewState}}check-up{{else}}check-down{{end}}">
+        {{if .NewState}}↑{{formatTime .Timestamp}}{{else}}↓{{formatTime .Timestamp}} ({{formatDuration $duration}}){{end}}
+      </span>
+      = {{if .NewState}}came back UP at {{formatTime .Timestamp}}{{else}}went DOWN at {{formatTime .Timestamp}}, was down for {{formatDuration $duration}}{{end}}
+      {{if .Error}}<span class="error-msg"> - {{.Error}}</span>{{end}}
+    </li>
+    {{else}}
+    <li style="margin: 0.25rem 0;">
+      <span class="{{if .NewState}}check-up{{else}}check-down{{end}}">
+        {{if .NewState}}↑{{formatTime .Timestamp}}{{else}}↓{{formatTime .Timestamp}}{{end}}
+      </span>
+      = {{if .NewState}}came back UP at {{formatTime .Timestamp}}{{else}}went DOWN at {{formatTime .Timestamp}}{{end}}
+      {{if .Error}}<span class="error-msg"> - {{.Error}}</span>{{end}}
+    </li>
+    {{end}}
+    {{end}}
+  </ul>
+  {{else}}
+  <p>No state changes in this time range</p>
   {{end}}
 </section>
-
-<section>
-  <h4>Recent Checks</h4>
-  <table>
-    {{range .RecentChecks}}
-    <tr>
-      <td>{{.Timestamp.Format "2006-01-02 15:04:05"}}</td>
-      <td class="{{if .Up}}check-up{{else}}check-down{{end}}">{{if .Up}}UP{{else}}DOWN{{end}}</td>
-      <td>{{formatLatency .LatencyMs}}</td>
-    </tr>
-    {{end}}
-  </table>
-</section>
-
-<button hx-post="/check/{{.Monitor.ID}}" hx-target="#details-{{.Monitor.ID}}" hx-swap="innerHTML">
-  [Check Now]
-</button>
