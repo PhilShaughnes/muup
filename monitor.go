@@ -28,7 +28,8 @@ type Checker struct {
 	running       map[int]chan struct{} // stop channels per monitor ID
 	hourlyStats   map[int]*HourlyStats  // in-memory hourly aggregation
 	recentChecks  map[int]*RingBuffer   // ring buffer for last 20 checks
-	lastCheckTime map[int]time.Time
+	lastCheckTime    map[int]time.Time
+	lastCheckLatency map[int]int
 	statsMu       sync.Mutex
 }
 
@@ -84,7 +85,8 @@ func NewChecker(db *DB) *Checker {
 		running:       make(map[int]chan struct{}),
 		hourlyStats:   make(map[int]*HourlyStats),
 		recentChecks:  make(map[int]*RingBuffer),
-		lastCheckTime: make(map[int]time.Time),
+		lastCheckTime:    make(map[int]time.Time),
+		lastCheckLatency: make(map[int]int),
 	}
 }
 
@@ -185,6 +187,7 @@ func (c *Checker) check(m Monitor) {
 	}
 	c.recentChecks[m.ID].Add(up)
 	c.lastCheckTime[m.ID] = time.Now()
+	c.lastCheckLatency[m.ID] = latency
 	c.statsMu.Unlock()
 }
 
@@ -239,11 +242,11 @@ func calculateMedian(values []int) int {
 	return sorted[mid]
 }
 
-// GetLastCheckTime returns the time of the most recent check for a monitor
-func (c *Checker) GetLastCheckTime(monitorID int) time.Time {
+// GetLastCheck returns the time and latency of the most recent check for a monitor
+func (c *Checker) GetLastCheck(monitorID int) (time.Time, int) {
 	c.statsMu.Lock()
 	defer c.statsMu.Unlock()
-	return c.lastCheckTime[monitorID]
+	return c.lastCheckTime[monitorID], c.lastCheckLatency[monitorID]
 }
 
 // GetStatusBlips returns the visual status for a monitor

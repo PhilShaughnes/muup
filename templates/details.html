@@ -5,7 +5,6 @@
   <span class="status-dot {{if .CurrentUp}}up{{else}}down{{end}}">●</span>
   <strong>{{if .CurrentUp}}UP{{else}}DOWN{{end}}</strong>
   since {{formatTime .StreakStart}} ({{formatStreak .StreakDuration .CurrentUp}})
-  <span class="last-check">checked at: {{.LastCheckTime.Format "2006-01-02T15:04:05"}}</span>
 </div>
 
 <section>
@@ -21,6 +20,7 @@
   </h4>
   <p class="status-graph">{{.StatusGraph}}</p>
   <p style="margin-top: 0.5rem;">Latency (when up): median {{formatLatency .MedianLatency}} | max {{formatLatency .MaxLatency}}</p>
+  <p style="margin-top: 0.25rem;">last ping: {{.LastPing}}</p>
 </section>
 
 <section>

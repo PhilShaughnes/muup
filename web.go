@@ -36,7 +36,7 @@ type MonitorStats struct {
 	SelectedRange   string
 	StatusBlips     string
 	StatusGraph     string // 24-block aggregated graph for details
-	LastCheckTime   time.Time
+	LastPing        string
 }
 
 // NewServer creates a new web server
@@ -163,7 +163,7 @@ func (s *Server) handleMonitorDetails(w http.ResponseWriter, r *http.Request) {
 		StateChanges:   stateChanges,
 		SelectedRange:  timeRange,
 		StatusGraph:    statusGraph,
-		LastCheckTime:  s.checker.GetLastCheckTime(id),
+		LastPing:       formatLastPing(s.checker.GetLastCheck(id)),
 	}
 
 	s.tmpl.ExecuteTemplate(w, "details.html", stats)
@@ -199,9 +199,17 @@ func FormatLatency(ms int) string {
 	return fmt.Sprintf("%dms", ms)
 }
 
-// FormatTime formats a timestamp as HH:MM
+// FormatTime formats a timestamp as YYYY-MM-DD HH:MM
 func FormatTime(t time.Time) string {
-	return t.Format("15:04")
+	return t.Format("2006-01-02 15:04")
+}
+
+// formatLastPing builds the "last ping" display string from a check time and latency
+func formatLastPing(t time.Time, latency int) string {
+	if t.IsZero() {
+		return "-"
+	}
+	return fmt.Sprintf("%s (%dms)", t.Format("2006-01-02T15:04:05"), latency)
 }
 
 // FormatDuration formats a duration in a compact way (e.g., "6m", "2h", "3d")
