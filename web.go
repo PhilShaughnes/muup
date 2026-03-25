@@ -236,7 +236,7 @@ func buildStatusGraph(changes []StateChange, timeRange time.Duration, currentUp 
 
 		// Find the most recent state change before this block time
 		state := currentUp
-		for j := len(changes) - 1; j >= 0; j-- {
+		for j := 0; j < len(changes); j++ {
 			if changes[j].Timestamp.Before(blockTime) {
 				state = changes[j].NewState
 				break
