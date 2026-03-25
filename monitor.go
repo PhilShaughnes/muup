@@ -23,12 +23,13 @@ type Monitor struct {
 
 // Checker manages HTTP checks for all monitors
 type Checker struct {
-	db           *DB
-	mu           sync.RWMutex
-	running      map[int]chan struct{} // stop channels per monitor ID
-	hourlyStats  map[int]*HourlyStats  // in-memory hourly aggregation
-	recentChecks map[int]*RingBuffer   // ring buffer for last 20 checks
-	statsMu      sync.Mutex
+	db            *DB
+	mu            sync.RWMutex
+	running       map[int]chan struct{} // stop channels per monitor ID
+	hourlyStats   map[int]*HourlyStats  // in-memory hourly aggregation
+	recentChecks  map[int]*RingBuffer   // ring buffer for last 20 checks
+	lastCheckTime map[int]time.Time
+	statsMu       sync.Mutex
 }
 
 // HourlyStats tracks running statistics for the current hour
@@ -79,10 +80,11 @@ func (rb *RingBuffer) String() string {
 
 func NewChecker(db *DB) *Checker {
 	return &Checker{
-		db:           db,
-		running:      make(map[int]chan struct{}),
-		hourlyStats:  make(map[int]*HourlyStats),
-		recentChecks: make(map[int]*RingBuffer),
+		db:            db,
+		running:       make(map[int]chan struct{}),
+		hourlyStats:   make(map[int]*HourlyStats),
+		recentChecks:  make(map[int]*RingBuffer),
+		lastCheckTime: make(map[int]time.Time),
 	}
 }
 
@@ -176,12 +178,13 @@ func (c *Checker) check(m Monitor) {
 		c.updateHourlyStats(m.ID, latency)
 	}
 
-	// Add to ring buffer
+	// Add to ring buffer and record check time
 	c.statsMu.Lock()
 	if c.recentChecks[m.ID] == nil {
 		c.recentChecks[m.ID] = &RingBuffer{}
 	}
 	c.recentChecks[m.ID].Add(up)
+	c.lastCheckTime[m.ID] = time.Now()
 	c.statsMu.Unlock()
 }
 
@@ -234,6 +237,13 @@ func calculateMedian(values []int) int {
 		return (sorted[mid-1] + sorted[mid]) / 2
 	}
 	return sorted[mid]
+}
+
+// GetLastCheckTime returns the time of the most recent check for a monitor
+func (c *Checker) GetLastCheckTime(monitorID int) time.Time {
+	c.statsMu.Lock()
+	defer c.statsMu.Unlock()
+	return c.lastCheckTime[monitorID]
 }
 
 // GetStatusBlips returns the visual status for a monitor

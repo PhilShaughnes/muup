@@ -36,6 +36,7 @@ type MonitorStats struct {
 	SelectedRange   string
 	StatusBlips     string
 	StatusGraph     string // 24-block aggregated graph for details
+	LastCheckTime   time.Time
 }
 
 // NewServer creates a new web server
@@ -162,6 +163,7 @@ func (s *Server) handleMonitorDetails(w http.ResponseWriter, r *http.Request) {
 		StateChanges:   stateChanges,
 		SelectedRange:  timeRange,
 		StatusGraph:    statusGraph,
+		LastCheckTime:  s.checker.GetLastCheckTime(id),
 	}
 
 	s.tmpl.ExecuteTemplate(w, "details.html", stats)

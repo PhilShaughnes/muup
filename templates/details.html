@@ -5,6 +5,7 @@
   <span class="status-dot {{if .CurrentUp}}up{{else}}down{{end}}">●</span>
   <strong>{{if .CurrentUp}}UP{{else}}DOWN{{end}}</strong>
   since {{formatTime .StreakStart}} ({{formatStreak .StreakDuration .CurrentUp}})
+  <span class="last-check">checked at: {{.LastCheckTime.Format "2006-01-02T15:04:05"}}</span>
 </div>
 
 <section>
