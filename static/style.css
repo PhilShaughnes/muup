@@ -2,9 +2,13 @@
 /* Green */
   /* --bg:#282c34;--fg:#7db16f;--border:#333;--success:#00ff00;--error:#ff3333;--muted:#009900; */
 /* Yellow */
-  --bg: #f6d307; --fg: #1f1f1f; --border: #8a7a00; --success: #006600; --error: #990000; --muted: #555;
+  /* --bg: #f6d307; --fg: #1f1f1f; --border: #8a7a00; --success: #006600; --error: #990000; --muted: #555; */
 /* Amber */
-  /* --bg:#1a0800;--fg:#ffb000;--border:#663300;--success:#00ff00;--error:#ff3333;--muted:#996600; */
+  --bg:#1a0800;--fg:#ffb000;--border:#663300;--success:#00ff00;--error:#ff3333;--muted:#996600;
+/* Light (pingen-derived) */
+  /* --bg:#ebebeb;--fg:#2e2e2e;--border:#d8d8d8;--success:#2a6e2a;--error:#b83232;--muted:#888888; */
+/* Dark (pingen-derived) */
+  /* --bg:#1a1a18;--fg:#cecdc3;--border:#272725;--success:#7db16f;--error:#cc4444;--muted:#878580; */
 }
 * { box-sizing: border-box; margin: 0; padding: 0; }
 body { background: var(--bg); color: var(--fg); font-family: 'SF Mono', Monaco, 'Courier New', monospace; font-size: 14px; line-height: 1.6; padding: 1rem; max-width: 900px; margin: 0 auto; }
